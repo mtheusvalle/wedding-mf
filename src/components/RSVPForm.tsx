@@ -181,64 +181,7 @@ export default function RSVPForm({ initialGuest, weddingConfig }: RSVPFormProps)
   }
 
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "2rem", maxWidth: "600px", margin: "0 auto" }}>
-      
-      {/* Wedding Information Box */}
-      <div className={styles.card} style={{ padding: "2.5rem", textAlign: "center" }}>
-        <h2 style={{ fontFamily: "var(--font-serif)", fontSize: "2rem", color: "var(--color-primary-dark)", marginBottom: "1rem" }}>
-          {brideAndGroom}
-        </h2>
-        <p style={{ fontStyle: "italic", color: "var(--color-text-muted)", marginBottom: "1.5rem" }}>
-          Convidam para a celebração de seu casamento
-        </p>
-
-        <div style={{ borderTop: "1px solid var(--color-border)", borderBottom: "1px solid var(--color-border)", padding: "1.5rem 0", margin: "1.5rem 0" }}>
-          <p style={{ fontWeight: 500, color: "var(--color-text-main)", textTransform: "capitalize" }}>
-            📅 {weddingDateFormatted}
-          </p>
-          <p style={{ fontWeight: 500, color: "var(--color-text-main)", marginTop: "0.5rem" }}>
-            ⏰ às {weddingTimeFormatted}h
-          </p>
-        </div>
-
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem", textAlign: "left", marginBottom: "1.5rem" }}>
-          <div>
-            <h4 style={{ fontSize: "0.8rem", textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--color-accent-dark)" }}>
-              ⛪ Cerimônia
-            </h4>
-            <p style={{ fontSize: "0.9rem", fontWeight: 500, marginTop: "0.25rem" }}>{weddingConfig.ceremonyPlace}</p>
-            <p style={{ fontSize: "0.8rem", color: "var(--color-text-muted)", marginTop: "0.25rem" }}>{weddingConfig.ceremonyAddress}</p>
-            <a
-              href={weddingConfig.ceremonyMapsUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn btn-outline btn-sm"
-              style={{ marginTop: "0.75rem", display: "inline-flex", padding: "0.4rem 1rem" }}
-            >
-              Google Maps
-            </a>
-          </div>
-
-          <div>
-            <h4 style={{ fontSize: "0.8rem", textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--color-accent-dark)" }}>
-              🥂 Recepção & Festa
-            </h4>
-            <p style={{ fontSize: "0.9rem", fontWeight: 500, marginTop: "0.25rem" }}>{weddingConfig.partyPlace}</p>
-            <p style={{ fontSize: "0.8rem", color: "var(--color-text-muted)", marginTop: "0.25rem" }}>{weddingConfig.partyAddress}</p>
-            <a
-              href={weddingConfig.partyMapsUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn btn-outline btn-sm"
-              style={{ marginTop: "0.75rem", display: "inline-flex", padding: "0.4rem 1rem" }}
-            >
-              Google Maps
-            </a>
-          </div>
-        </div>
-      </div>
-
-      {/* RSVP Form Box */}
+    <div style={{ maxWidth: "600px", margin: "0 auto" }}>
       <div className={styles.card} style={{ padding: "2.5rem" }}>
         
         {/* STATE 1: SEARCH GUEST */}
@@ -392,6 +335,61 @@ export default function RSVPForm({ initialGuest, weddingConfig }: RSVPFormProps)
                 Será um dia muito especial, preparado com amor,<br />
                 e a sua presença tornará esse momento ainda mais inesquecível.
               </p>
+            </div>
+
+            {/* Local Section */}
+            <div style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+              gap: "1.5rem",
+              textAlign: "left",
+              backgroundColor: "var(--color-bg-alt)",
+              padding: "1.5rem",
+              borderRadius: "8px",
+              marginBottom: "2.5rem",
+              border: "1px solid var(--color-border)"
+            }}>
+              <div>
+                <h4 style={{ fontSize: "0.85rem", textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--color-primary-dark)", fontWeight: "600" }}>
+                  ⛪ Cerimônia
+                </h4>
+                <p style={{ fontSize: "0.9rem", fontWeight: "600", marginTop: "0.25rem", color: "var(--color-text-main)" }}>
+                  {weddingConfig.ceremonyPlace}
+                </p>
+                <p style={{ fontSize: "0.8rem", color: "var(--color-text-muted)", marginTop: "0.25rem", lineHeight: "1.4" }}>
+                  {weddingConfig.ceremonyAddress}
+                </p>
+                <a
+                  href={weddingConfig.ceremonyMapsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-outline btn-sm"
+                  style={{ marginTop: "0.75rem", display: "inline-flex", padding: "0.4rem 1rem", fontSize: "0.75rem" }}
+                >
+                  Google Maps
+                </a>
+              </div>
+
+              <div>
+                <h4 style={{ fontSize: "0.85rem", textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--color-primary-dark)", fontWeight: "600" }}>
+                  🥂 Recepção & Festa
+                </h4>
+                <p style={{ fontSize: "0.9rem", fontWeight: "600", marginTop: "0.25rem", color: "var(--color-text-main)" }}>
+                  {weddingConfig.partyPlace}
+                </p>
+                <p style={{ fontSize: "0.8rem", color: "var(--color-text-muted)", marginTop: "0.25rem", lineHeight: "1.4" }}>
+                  {weddingConfig.partyAddress}
+                </p>
+                <a
+                  href={weddingConfig.partyMapsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-outline btn-sm"
+                  style={{ marginTop: "0.75rem", display: "inline-flex", padding: "0.4rem 1rem", fontSize: "0.75rem" }}
+                >
+                  Google Maps
+                </a>
+              </div>
             </div>
 
             <form onSubmit={handleSubmit}>
