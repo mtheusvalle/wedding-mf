@@ -983,19 +983,11 @@ export default function AdminDashboard({
                           title="Clique para copiar o link completo"
                           onClick={() => copyInviteLink(g.code, g.id)}
                         >
-                          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                          {copiedId === g.id ? (
+                            <span style={{ color: "var(--color-primary)", fontWeight: "bold" }}>Copiado!</span>
+                          ) : (
                             <code style={{ fontSize: "0.8rem", color: "var(--color-primary-dark)" }}>/{g.code}</code>
-                            <button
-                              className="btn btn-outline btn-sm"
-                              style={{ padding: "0.25rem 0.5rem", fontSize: "0.7rem", textTransform: "none" }}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                copyInviteLink(g.code, g.id);
-                              }}
-                            >
-                              {copiedId === g.id ? "Copiado!" : "Copiar"}
-                            </button>
-                          </div>
+                          )}
                         </td>
                         <td style={{ textAlign: "center" }}>{g.allowedAdditionalGuests}</td>
                         <td style={{ textAlign: "center" }}>
