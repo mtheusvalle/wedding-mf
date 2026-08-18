@@ -105,6 +105,7 @@ export default function AdminDashboard({
 
   // Copy success message status
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [copiedPhoneId, setCopiedPhoneId] = useState<string | null>(null);
 
   // Refs for hidden file inputs to trigger uploads
   const configUploadRef = useRef<HTMLInputElement>(null);
@@ -180,6 +181,13 @@ export default function AdminDashboard({
     navigator.clipboard.writeText(link);
     setCopiedId(guestId);
     setTimeout(() => setCopiedId(null), 2000);
+  };
+
+  // Helper copy phone number
+  const copyPhone = (phone: string, guestId: string) => {
+    navigator.clipboard.writeText(phone);
+    setCopiedPhoneId(guestId);
+    setTimeout(() => setCopiedPhoneId(null), 2000);
   };
 
   // --- REFRESH DATA API ---
@@ -959,14 +967,31 @@ export default function AdminDashboard({
                     filteredGuests.map((g) => (
                       <tr key={g.id}>
                         <td style={{ fontWeight: 500 }}>{g.name}</td>
-                        <td>{g.phone}</td>
-                        <td>
+                        <td
+                          style={{ cursor: "pointer" }}
+                          title="Clique para copiar o telefone"
+                          onClick={() => copyPhone(g.phone, g.id)}
+                        >
+                          {copiedPhoneId === g.id ? (
+                            <span style={{ color: "var(--color-primary)", fontWeight: "bold" }}>Copiado!</span>
+                          ) : (
+                            g.phone
+                          )}
+                        </td>
+                        <td
+                          style={{ cursor: "pointer" }}
+                          title="Clique para copiar o link completo"
+                          onClick={() => copyInviteLink(g.code, g.id)}
+                        >
                           <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
                             <code style={{ fontSize: "0.8rem", color: "var(--color-primary-dark)" }}>/{g.code}</code>
                             <button
                               className="btn btn-outline btn-sm"
                               style={{ padding: "0.25rem 0.5rem", fontSize: "0.7rem", textTransform: "none" }}
-                              onClick={() => copyInviteLink(g.code, g.id)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                copyInviteLink(g.code, g.id);
+                              }}
                             >
                               {copiedId === g.id ? "Copiado!" : "Copiar"}
                             </button>

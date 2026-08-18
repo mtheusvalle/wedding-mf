@@ -57,7 +57,7 @@ export default function RSVPForm({ initialGuest, weddingConfig }: RSVPFormProps)
     if (guest) {
       setStatus(guest.status === "PENDING" ? "CONFIRMED" : guest.status);
       setAdditionalCount(guest.confirmedAdditionalGuests || 0);
-      setNotes(guest.notes || "");
+      setNotes("");
     }
   }, [guest]);
 

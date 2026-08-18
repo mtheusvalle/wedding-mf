@@ -48,16 +48,21 @@ export async function POST(request: Request) {
       names = confirmedNames ? confirmedNames.trim() : null;
     }
 
+    const updateData: any = {
+      status,
+      confirmedAdditionalGuests: additionalGuestsCount,
+      confirmedNames: names,
+      confirmedAt: new Date(),
+    };
+
+    if (notes && notes.trim() !== "") {
+      updateData.notes = notes.trim();
+    }
+
     // Update guest confirmation in database
     await prisma.guest.update({
       where: { id: guestId },
-      data: {
-        status,
-        confirmedAdditionalGuests: additionalGuestsCount,
-        confirmedNames: names,
-        notes: notes ? notes.trim() : null,
-        confirmedAt: new Date(),
-      },
+      data: updateData,
     });
 
     const successMessage =
