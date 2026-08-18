@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import RSVPForm from "@/components/RSVPForm";
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 
 export const revalidate = 0;
 
@@ -27,6 +28,10 @@ export default async function RSVPTokenPage({ params }: PageProps) {
   const guest = await prisma.guest.findUnique({
     where: { code: token.trim().toLowerCase() },
   });
+
+  if (guest && guest.status !== "PENDING") {
+    redirect("/");
+  }
 
   const dbConfig = await prisma.weddingConfig.findUnique({
     where: { id: "global" },

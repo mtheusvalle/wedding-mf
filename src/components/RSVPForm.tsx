@@ -45,7 +45,7 @@ export default function RSVPForm({ initialGuest, weddingConfig }: RSVPFormProps)
 
   // Form states
   const [status, setStatus] = useState<string>("");
-  const [additionalCount, setAdditionalCount] = useState<number>(0);
+  const [additionalCount, setAdditionalCount] = useState<number | string>(0);
   const [notes, setNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
   
@@ -55,11 +55,15 @@ export default function RSVPForm({ initialGuest, weddingConfig }: RSVPFormProps)
   // Initialize form state when guest changes (e.g. on mount if loaded by URL token)
   useEffect(() => {
     if (guest) {
-      setStatus(guest.status === "PENDING" ? "CONFIRMED" : guest.status);
+      if (guest.status !== "PENDING") {
+        router.push("/");
+        return;
+      }
+      setStatus("CONFIRMED");
       setAdditionalCount(guest.confirmedAdditionalGuests || 0);
       setNotes("");
     }
-  }, [guest]);
+  }, [guest, router]);
 
   // Handle countdown timer for redirecting
   useEffect(() => {
@@ -91,6 +95,11 @@ export default function RSVPForm({ initialGuest, weddingConfig }: RSVPFormProps)
         throw new Error(data.message || "Código não encontrado.");
       }
 
+      if (data.status !== "PENDING") {
+        router.push("/");
+        return;
+      }
+
       setGuest(data);
     } catch (err: any) {
       setSearchError(err.message || "Erro ao buscar convite.");
@@ -116,7 +125,7 @@ export default function RSVPForm({ initialGuest, weddingConfig }: RSVPFormProps)
         body: JSON.stringify({
           guestId: guest.id,
           status,
-          confirmedAdditionalGuests: status === "CONFIRMED" ? additionalCount : 0,
+          confirmedAdditionalGuests: status === "CONFIRMED" ? (parseInt(additionalCount.toString(), 10) || 0) : 0,
           confirmedNames: "",
           notes,
         }),
@@ -331,8 +340,13 @@ export default function RSVPForm({ initialGuest, weddingConfig }: RSVPFormProps)
                     min={0}
                     value={additionalCount}
                     onChange={(e) => {
-                      const val = parseInt(e.target.value, 10);
-                      setAdditionalCount(isNaN(val) ? 0 : Math.max(0, val));
+                      const valStr = e.target.value;
+                      if (valStr === "") {
+                        setAdditionalCount("");
+                      } else {
+                        const val = parseInt(valStr, 10);
+                        setAdditionalCount(isNaN(val) ? 0 : Math.max(0, val));
+                      }
                     }}
                     disabled={submitting}
                     required
