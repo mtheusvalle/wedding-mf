@@ -23,7 +23,7 @@ function getDirectDatabaseUrl(urlStr: string): string {
   return urlStr;
 }
 
-const connectionString = process.env.DATABASE_URL || "";
+const connectionString = process.env.DATABASE_URL || process.env.POSTGRES_PRISMA_URL || "";
 const directUrl = getDirectDatabaseUrl(connectionString);
 
 let prisma: PrismaClient;
