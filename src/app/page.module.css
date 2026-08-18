@@ -565,9 +565,25 @@
   }
   .menuButton {
     display: block;
+    position: relative;
+    z-index: 1001;
   }
   .navList {
-    display: none; /* Can be handled via burger menu if needed */
+    display: none;
+    flex-direction: column;
+    position: fixed;
+    top: 70px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #fdfcfb !important; /* Solid Warm Off-White */
+    z-index: 1000;
+    padding: 2rem;
+    gap: 2rem;
+    align-items: center;
+  }
+  .mobileMenuOpen {
+    display: flex !important;
   }
   .heroNames {
     font-size: 3.25rem;

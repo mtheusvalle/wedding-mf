@@ -30,28 +30,7 @@ export default function Header({ names }: HeaderProps) {
           {menuOpen ? "✕" : "☰"}
         </button>
 
-        <nav
-          className={`${styles.navList} ${menuOpen ? styles.mobileMenuOpen : ""}`}
-          style={
-            menuOpen
-              ? {
-                  display: "flex",
-                  flexDirection: "column",
-                  position: "fixed",
-                  top: "70px",
-                  left: "0",
-                  right: "0",
-                  bottom: "0",
-                  backgroundColor: "var(--color-bg)",
-                  zIndex: "99",
-                  padding: "2rem",
-                  gap: "2rem",
-                  alignItems: "center",
-                  animation: "fadeIn 0.3s forwards",
-                }
-              : {}
-          }
-        >
+        <nav className={`${styles.navList} ${menuOpen ? styles.mobileMenuOpen : ""}`}>
           <li>
             <a href="#noivos" className={styles.navLink} onClick={closeMenu}>
               Noivos
