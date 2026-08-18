@@ -3,10 +3,15 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../src/generated/prisma/client.js";
 import "dotenv/config";
 
-const connectionString = process.env.DATABASE_URL || process.env.POSTGRES_URL_NON_POOLING || process.env.POSTGRES_PRISMA_URL;
+const connectionString =
+  process.env.DATABASE_URL ||
+  process.env.POSTGRES_URL_NON_POOLING ||
+  process.env.DATABASE_POSTGRES_URL_NON_POOLING ||
+  process.env.POSTGRES_PRISMA_URL ||
+  process.env.DATABASE_POSTGRES_PRISMA_URL;
 
 if (!connectionString) {
-  console.error("Nenhuma URL de conexão encontrada (DATABASE_URL, POSTGRES_URL_NON_POOLING ou POSTGRES_PRISMA_URL). Seed abortado.");
+  console.error("Nenhuma URL de conexão encontrada. Seed abortado.");
   process.exit(1);
 }
 

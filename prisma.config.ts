@@ -4,15 +4,15 @@ import "dotenv/config";
 import { defineConfig } from "prisma/config";
 
 // Inject Vercel Supabase integration variables as fallbacks
-if (!process.env["DATABASE_URL"] && process.env["POSTGRES_PRISMA_URL"]) {
-  process.env["DATABASE_URL"] = process.env["POSTGRES_PRISMA_URL"];
+if (!process.env["DATABASE_URL"]) {
+  process.env["DATABASE_URL"] = process.env["POSTGRES_PRISMA_URL"] || process.env["DATABASE_POSTGRES_PRISMA_URL"];
 }
 
 // Automatically generate DIRECT_URL for migrations if using Supabase pooler on port 6543
 if (process.env["DATABASE_URL"] && process.env["DATABASE_URL"].includes(":6543")) {
   process.env["DIRECT_URL"] = process.env["DATABASE_URL"].replace(":6543", ":5432");
-} else if (!process.env["DIRECT_URL"] && process.env["POSTGRES_URL_NON_POOLING"]) {
-  process.env["DIRECT_URL"] = process.env["POSTGRES_URL_NON_POOLING"];
+} else if (!process.env["DIRECT_URL"]) {
+  process.env["DIRECT_URL"] = process.env["POSTGRES_URL_NON_POOLING"] || process.env["DATABASE_POSTGRES_URL_NON_POOLING"];
 }
 
 export default defineConfig({
