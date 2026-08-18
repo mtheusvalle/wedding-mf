@@ -73,7 +73,7 @@ export default async function Home() {
     year: "numeric",
     timeZone: "America/Sao_Paulo",
   }).format(new Date(config.weddingDate));
-  
+
   const weddingTimeFormatted = new Intl.DateTimeFormat("pt-BR", {
     hour: "2-digit",
     minute: "2-digit",
@@ -97,7 +97,7 @@ export default async function Home() {
           <div className={styles.heroDate}>
             {weddingDateFormatted} às {weddingTimeFormatted}h
           </div>
-          
+
           {/* Countdown timer client component */}
           <Countdown weddingDate={config.weddingDate.toISOString()} />
         </div>
@@ -133,7 +133,7 @@ export default async function Home() {
             <h2>Galeria de Fotos</h2>
             <p>Momentos felizes eternizados</p>
           </div>
-          
+
           {/* Photos Grid & Lightbox client component */}
           <Gallery images={galleryImages.map(img => ({
             id: img.id,
@@ -223,9 +223,8 @@ export default async function Home() {
             {timelineItems.map((item: any, index: number) => (
               <div
                 key={index}
-                className={`${styles.timelineItem} ${
-                  index % 2 === 0 ? styles.timelineLeft : styles.timelineRight
-                }`}
+                className={`${styles.timelineItem} ${index % 2 === 0 ? styles.timelineLeft : styles.timelineRight
+                  }`}
               >
                 <div className={styles.timelineContent}>
                   <span className={styles.timelineTime}>{item.time}</span>
@@ -245,9 +244,9 @@ export default async function Home() {
             <h2>Lista de Presentes</h2>
             <p>Sua presença é o maior presente, mas se quiser nos agradar...</p>
           </div>
-          
+
           <p className={styles.giftsIntro}>
-            Escolhemos alguns presentes simbólicos de cotas de lua de mel e contribuições para o nosso enxoval. 
+            Escolhemos alguns presentes simbólicos de cotas de lua de mel e contribuições para o nosso enxoval.
             Você pode presentear-nos com facilidade e segurança via Pix.
           </p>
 
@@ -271,7 +270,7 @@ export default async function Home() {
           <p style={{ fontSize: "1.1rem", fontStyle: "italic", marginBottom: "2rem", opacity: "0.9" }}>
             Por favor, confirme sua presença até 30 dias antes do casamento para que possamos planejar tudo com carinho.
           </p>
-          <Link href="/confirmar-presenca" className="btn btn-accent" style={{ padding: "1rem 3rem", fontSize: "1rem" }}>
+          <Link href="/confirmar-presenca" className="btn btn-confirm-menu" style={{ padding: "1rem 3rem", fontSize: "1rem" }}>
             Confirmar Presença
           </Link>
         </div>

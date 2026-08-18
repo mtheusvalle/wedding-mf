@@ -59,7 +59,7 @@ export default function Header({ names }: HeaderProps) {
           <li>
             <Link
               href="/confirmar-presenca"
-              className="btn btn-primary btn-sm"
+              className="btn btn-confirm-menu"
               onClick={closeMenu}
               style={{ padding: "0.6rem 1.5rem" }}
             >
