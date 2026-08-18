@@ -2,6 +2,8 @@ import pg from "pg";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@/generated/prisma/client";
 
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+
 // Decodes a local prisma+postgres:// connection string into the actual direct postgres:// URL.
 // This is necessary because pg.Pool does not natively understand the prisma+postgres:// proxy protocol.
 function getDirectDatabaseUrl(urlStr: string): string {
@@ -30,7 +32,11 @@ let prisma: PrismaClient;
 let pool: pg.Pool;
 
 if (process.env.NODE_ENV === "production") {
-  pool = new pg.Pool({ connectionString: directUrl, max: 2 });
+  pool = new pg.Pool({
+    connectionString: directUrl,
+    max: 2,
+    ssl: { rejectUnauthorized: false },
+  });
   const adapter = new PrismaPg(pool);
   prisma = new PrismaClient({ adapter });
 } else {
@@ -41,7 +47,11 @@ if (process.env.NODE_ENV === "production") {
   };
 
   if (!globalWithPrisma.pool) {
-    globalWithPrisma.pool = new pg.Pool({ connectionString: directUrl, max: 2 });
+    globalWithPrisma.pool = new pg.Pool({
+      connectionString: directUrl,
+      max: 2,
+      ssl: { rejectUnauthorized: false },
+    });
   }
   pool = globalWithPrisma.pool;
 
