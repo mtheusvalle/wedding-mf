@@ -1,0 +1,88 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Guest {
+  id                        String        @id @default(uuid())
+  name                      String
+  phone                     String
+  code                      String        @unique
+  allowedAdditionalGuests   Int           @default(0)
+  confirmedAdditionalGuests Int           @default(0)
+  confirmedNames            String?       // Names of confirmed additional guests, separated by commas or newlines
+  status                    String        @default("PENDING") // PENDING, CONFIRMED, DECLINED
+  notes                     String?       @db.Text
+  confirmedAt               DateTime?
+  createdAt                 DateTime      @default(now())
+  updatedAt                 DateTime      @updatedAt
+  transactions              Transaction[]
+}
+
+model Gift {
+  id           String        @id @default(uuid())
+  name         String
+  description  String        @db.Text
+  image        String
+  price        Int           // Value in cents (e.g., 25000 for R$ 250,00)
+  active       Boolean       @default(true)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  transactions Transaction[]
+}
+
+model Transaction {
+  id            String    @id @default(uuid())
+  giftId        String
+  gift          Gift      @relation(fields: [giftId], references: [id], onDelete: Cascade)
+  guestId       String?
+  guest         Guest?    @relation(fields: [guestId], references: [id], onDelete: SetNull)
+  buyerName     String
+  buyerPhone    String?
+  buyerEmail    String?
+  message       String?   @db.Text
+  amount        Int       // In cents
+  status        String    @default("PENDING") // PENDING, PAID, FAILED, CANCELLED
+  gateway       String    @default("PIX")
+  transactionId String?   @unique // NSU or checkout slug from InfinitePay
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model WeddingConfig {
+  id              String   @id @default("global")
+  brideName       String   @default("Maria")
+  groomName       String   @default("João")
+  weddingDate     DateTime
+  ceremonyPlace   String
+  ceremonyAddress String
+  ceremonyMapsUrl String
+  partyPlace      String
+  partyAddress    String
+  partyMapsUrl    String
+  storyTitle      String
+  storyText       String   @db.Text
+  storyImage      String
+  heroImage       String   @default("https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=80&w=1200")
+  pixKey          String   @default("seu-pix@email.com")
+  pixQrCode       String   @default("https://images.unsplash.com/photo-1595079676339-1534801ad6cf?auto=format&fit=crop&q=80&w=400")
+  timeline        String   @db.Text // JSON string containing timeline array
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model GalleryImage {
+  id        String   @id @default(uuid())
+  url       String
+  caption   String?  @db.Text
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
