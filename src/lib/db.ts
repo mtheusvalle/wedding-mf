@@ -2,10 +2,12 @@ import pg from "pg";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@/generated/prisma/client";
 
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+// Bypass local SSL certificate validation to prevent chain errors on developer machines
+if (!process.env.VERCEL) {
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+}
 
 // Decodes a local prisma+postgres:// connection string into the actual direct postgres:// URL.
-// This is necessary because pg.Pool does not natively understand the prisma+postgres:// proxy protocol.
 function getDirectDatabaseUrl(urlStr: string): string {
   if (urlStr && urlStr.startsWith("prisma+postgres://")) {
     try {
@@ -25,18 +27,14 @@ function getDirectDatabaseUrl(urlStr: string): string {
   return urlStr;
 }
 
-const connectionString = process.env.DATABASE_URL || process.env.POSTGRES_PRISMA_URL || process.env.DATABASE_POSTGRES_PRISMA_URL || "";
+const connectionString = process.env.DATABASE_URL || "";
 const directUrl = getDirectDatabaseUrl(connectionString);
 
 let prisma: PrismaClient;
 let pool: pg.Pool;
 
 if (process.env.NODE_ENV === "production") {
-  pool = new pg.Pool({
-    connectionString: directUrl,
-    max: 2,
-    ssl: { rejectUnauthorized: false },
-  });
+  pool = new pg.Pool({ connectionString: directUrl, max: 2 });
   const adapter = new PrismaPg(pool);
   prisma = new PrismaClient({ adapter });
 } else {
@@ -47,11 +45,7 @@ if (process.env.NODE_ENV === "production") {
   };
 
   if (!globalWithPrisma.pool) {
-    globalWithPrisma.pool = new pg.Pool({
-      connectionString: directUrl,
-      max: 2,
-      ssl: { rejectUnauthorized: false },
-    });
+    globalWithPrisma.pool = new pg.Pool({ connectionString: directUrl, max: 2 });
   }
   pool = globalWithPrisma.pool;
 

@@ -4,15 +4,10 @@ import { PrismaClient } from "../src/generated/prisma/client.js";
 import "dotenv/config";
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
-const connectionString =
-  process.env.DATABASE_URL ||
-  process.env.POSTGRES_URL_NON_POOLING ||
-  process.env.DATABASE_POSTGRES_URL_NON_POOLING ||
-  process.env.POSTGRES_PRISMA_URL ||
-  process.env.DATABASE_POSTGRES_PRISMA_URL;
+const connectionString = process.env.DIRECT_URL || process.env.DATABASE_URL;
 
 if (!connectionString) {
-  console.error("Nenhuma URL de conexão encontrada. Seed abortado.");
+  console.error("Nenhuma URL de conexão encontrada (DIRECT_URL ou DATABASE_URL). Seed abortado.");
   process.exit(1);
 }
 
