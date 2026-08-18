@@ -113,6 +113,7 @@ export default function AdminDashboard({
   const giftUploadRef = useRef<HTMLInputElement>(null);
   const galleryUploadRef = useRef<HTMLInputElement>(null);
   const mediaLibraryUploadRef = useRef<HTMLInputElement>(null);
+  const guestImportRef = useRef<HTMLInputElement>(null);
 
   // --- TAB 2: GUEST MODAL STATES ---
   const [guestModalOpen, setGuestModalOpen] = useState(false);
@@ -127,6 +128,8 @@ export default function AdminDashboard({
     status: "PENDING",
     notes: "",
   });
+
+  const [importingGuests, setImportingGuests] = useState(false);
 
   // --- TAB 3: GIFT MODAL STATES ---
   const [giftModalOpen, setGiftModalOpen] = useState(false);
@@ -335,6 +338,40 @@ export default function AdminDashboard({
       await refreshGuests();
     } catch (err: any) {
       alert(err.message);
+    }
+  };
+
+  const handleGuestImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setImportingGuests(true);
+    setErrorMsg(null);
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await fetch("/api/admin/guests/import", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || "Erro ao importar convidados.");
+      }
+
+      alert(data.message);
+      await refreshGuests();
+    } catch (err: any) {
+      alert(err.message || "Erro ao processar importação.");
+    } finally {
+      setImportingGuests(false);
+      if (guestImportRef.current) {
+        guestImportRef.current.value = "";
+      }
     }
   };
 
@@ -816,9 +853,26 @@ export default function AdminDashboard({
                 </select>
               </div>
 
-              <button className="btn btn-primary" onClick={openAddGuestModal}>
-                ➕ Novo Convidado
-              </button>
+              <div style={{ display: "flex", gap: "0.5rem" }}>
+                <input
+                  type="file"
+                  ref={guestImportRef}
+                  style={{ display: "none" }}
+                  accept=".xlsx, .xls"
+                  onChange={handleGuestImport}
+                />
+                <button
+                  type="button"
+                  className="btn btn-outline"
+                  onClick={() => guestImportRef.current?.click()}
+                  disabled={importingGuests}
+                >
+                  📥 {importingGuests ? "Importando..." : "Importar Planilha"}
+                </button>
+                <button className="btn btn-primary" onClick={openAddGuestModal}>
+                  ➕ Novo Convidado
+                </button>
+              </div>
             </div>
 
             <div className="table-wrapper">
