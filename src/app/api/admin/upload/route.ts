@@ -20,7 +20,7 @@ export async function GET() {
         const ext = blob.pathname.substring(blob.pathname.lastIndexOf(".")).toLowerCase();
         return imageExtensions.includes(ext);
       })
-      .map((blob) => blob.url);
+      .map((blob) => `/api/admin/upload/view?pathname=${blob.pathname}`);
 
     return NextResponse.json(imageUrls);
   } catch (error) {
@@ -80,14 +80,15 @@ export async function POST(request: Request) {
       processedBuffer = buffer;
     }
 
-    // Upload directly to Vercel Blob Storage with public access
+    // Upload directly to Vercel Blob Storage with private access
     const blob = await put(filename, processedBuffer, {
-      access: "public",
+      access: "private",
     });
 
-    console.log(`File uploaded successfully to Vercel Blob: ${blob.url}`);
+    const relativeUrl = `/api/admin/upload/view?pathname=${blob.pathname}`;
+    console.log(`File uploaded successfully to Vercel Blob: ${relativeUrl}`);
 
-    return NextResponse.json({ url: blob.url, name: filename });
+    return NextResponse.json({ url: relativeUrl, name: filename });
   } catch (error) {
     console.error("Error writing upload file:", error);
     return NextResponse.json(
