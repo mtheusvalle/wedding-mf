@@ -46,7 +46,6 @@ export default function RSVPForm({ initialGuest, weddingConfig }: RSVPFormProps)
   // Form states
   const [status, setStatus] = useState<string>("");
   const [additionalCount, setAdditionalCount] = useState<number>(0);
-  const [additionalNames, setAdditionalNames] = useState<string[]>([]);
   const [notes, setNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
   
@@ -59,14 +58,6 @@ export default function RSVPForm({ initialGuest, weddingConfig }: RSVPFormProps)
       setStatus(guest.status === "PENDING" ? "CONFIRMED" : guest.status);
       setAdditionalCount(guest.confirmedAdditionalGuests || 0);
       setNotes(guest.notes || "");
-      
-      const namesArray = guest.confirmedNames ? guest.confirmedNames.split(", ") : [];
-      // pre-fill with existing names or empty strings
-      const initialNames = Array.from(
-        { length: guest.allowedAdditionalGuests },
-        (_, i) => namesArray[i] || ""
-      );
-      setAdditionalNames(initialNames);
     }
   }, [guest]);
 
@@ -116,18 +107,6 @@ export default function RSVPForm({ initialGuest, weddingConfig }: RSVPFormProps)
     setSubmitting(true);
     setSearchError(null);
 
-    // Get only the names of confirmed additional guests
-    const activeNames = additionalNames
-      .slice(0, additionalCount)
-      .map((name) => name.trim())
-      .filter((name) => name !== "");
-
-    if (status === "CONFIRMED" && additionalCount > 0 && activeNames.length < additionalCount) {
-      setSearchError("Por favor, preencha os nomes de todos os acompanhantes.");
-      setSubmitting(false);
-      return;
-    }
-
     try {
       const response = await fetch("/api/rsvp", {
         method: "POST",
@@ -138,7 +117,7 @@ export default function RSVPForm({ initialGuest, weddingConfig }: RSVPFormProps)
           guestId: guest.id,
           status,
           confirmedAdditionalGuests: status === "CONFIRMED" ? additionalCount : 0,
-          confirmedNames: status === "CONFIRMED" ? activeNames.join(", ") : "",
+          confirmedNames: "",
           notes,
         }),
       });
@@ -157,11 +136,7 @@ export default function RSVPForm({ initialGuest, weddingConfig }: RSVPFormProps)
     }
   };
 
-  const handleNameChange = (index: number, val: string) => {
-    const updated = [...additionalNames];
-    updated[index] = val;
-    setAdditionalNames(updated);
-  };
+
 
   const brideAndGroom = `${weddingConfig.brideName} & ${weddingConfig.groomName}`;
   const weddingDateFormatted = new Intl.DateTimeFormat("pt-BR", {
@@ -344,45 +319,24 @@ export default function RSVPForm({ initialGuest, weddingConfig }: RSVPFormProps)
               </div>
 
               {/* Conditional Companions Fields */}
-              {status === "CONFIRMED" && guest.allowedAdditionalGuests > 0 && (
-                <div>
-                  <div className="form-group">
-                    <label className="form-label" htmlFor="additional-count">
-                      Quantos acompanhantes trará? (Máximo: {guest.allowedAdditionalGuests})
-                    </label>
-                    <select
-                      id="additional-count"
-                      className="form-control"
-                      value={additionalCount}
-                      onChange={(e) => setAdditionalCount(parseInt(e.target.value, 10))}
-                      disabled={submitting}
-                    >
-                      {Array.from({ length: guest.allowedAdditionalGuests + 1 }, (_, i) => (
-                        <option key={i} value={i}>
-                          {i} {i === 1 ? "acompanhante" : "acompanhantes"}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  {/* Companion Names Inputs */}
-                  {Array.from({ length: additionalCount }).map((_, idx) => (
-                    <div className="form-group" key={idx}>
-                      <label className="form-label" htmlFor={`companion-name-${idx}`}>
-                        Nome do Acompanhante {idx + 1} *
-                      </label>
-                      <input
-                        type="text"
-                        id={`companion-name-${idx}`}
-                        className="form-control"
-                        placeholder="Nome completo do acompanhante"
-                        value={additionalNames[idx] || ""}
-                        onChange={(e) => handleNameChange(idx, e.target.value)}
-                        disabled={submitting}
-                        required
-                      />
-                    </div>
-                  ))}
+              {status === "CONFIRMED" && (
+                <div className="form-group">
+                  <label className="form-label" htmlFor="additional-count">
+                    Quantos acompanhantes trará com você? (Apenas quantidade)
+                  </label>
+                  <input
+                    type="number"
+                    id="additional-count"
+                    className="form-control"
+                    min={0}
+                    value={additionalCount}
+                    onChange={(e) => {
+                      const val = parseInt(e.target.value, 10);
+                      setAdditionalCount(isNaN(val) ? 0 : Math.max(0, val));
+                    }}
+                    disabled={submitting}
+                    required
+                  />
                 </div>
               )}
 

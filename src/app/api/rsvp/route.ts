@@ -45,15 +45,6 @@ export async function POST(request: Request) {
         );
       }
 
-      if (additionalGuestsCount > guest.allowedAdditionalGuests) {
-        return NextResponse.json(
-          {
-            message: `Você só pode levar até ${guest.allowedAdditionalGuests} acompanhante(s).`,
-          },
-          { status: 400 }
-        );
-      }
-
       names = confirmedNames ? confirmedNames.trim() : null;
     }
 
