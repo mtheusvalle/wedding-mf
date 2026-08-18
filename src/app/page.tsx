@@ -263,7 +263,7 @@ export default async function Home() {
       </section>
 
       {/* RSVP call to action */}
-      <section className="section" style={{ background: "linear-gradient(to right, #8e5b60, #a96860)", color: "var(--color-white)", textAlign: "center" }}>
+      <section className="section" style={{ background: "linear-gradient(to right, var(--color-primary), var(--color-primary-dark))", color: "var(--color-white)", textAlign: "center" }}>
         <div className="container">
           <h2 style={{ fontFamily: "var(--font-serif)", fontSize: "2.5rem", marginBottom: "1rem", color: "var(--color-white)" }}>
             Você vai celebrar com a gente?

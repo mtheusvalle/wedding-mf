@@ -2,9 +2,9 @@
 
 :root {
   /* Color Palette */
-  --color-primary: #8e5b60;          /* Old Rose / Dusty Pink */
-  --color-primary-dark: #704247;     /* Darker Rose */
-  --color-primary-light: #f5ebeb;    /* Very soft rose background */
+  --color-primary: #0e0e55;          /* Deep Navy Blue */
+  --color-primary-dark: #06063b;     /* Darker Navy */
+  --color-primary-light: #f0f2f9;    /* Very soft blue/indigo background */
   --color-accent: #c5a880;           /* Soft Gold / Champagne */
   --color-accent-dark: #a88d65;      /* Darker Gold */
   --color-bg: #fdfcfb;               /* Warm Off-White */
@@ -16,16 +16,16 @@
   --color-success: #5f7a68;          /* Sage Green */
   --color-danger: #a96860;           /* Muted Red */
   --color-warning: #d09c67;          /* Ocre Yellow */
-  --color-overlay: rgba(51, 47, 46, 0.4);
+  --color-overlay: rgba(14, 14, 85, 0.45);
 
   /* Fonts */
   --font-serif: var(--font-playfair-display), Georgia, serif;
   --font-sans: var(--font-montserrat), Arial, sans-serif;
 
   /* Shadows */
-  --shadow-sm: 0 2px 4px rgba(142, 91, 96, 0.05);
-  --shadow-md: 0 8px 16px rgba(142, 91, 96, 0.08);
-  --shadow-lg: 0 16px 32px rgba(142, 91, 96, 0.12);
+  --shadow-sm: 0 2px 4px rgba(14, 14, 85, 0.05);
+  --shadow-md: 0 8px 16px rgba(14, 14, 85, 0.08);
+  --shadow-lg: 0 16px 32px rgba(14, 14, 85, 0.12);
 
   /* Transitions */
   --transition-smooth: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
