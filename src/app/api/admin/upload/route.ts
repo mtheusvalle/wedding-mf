@@ -1,43 +1,62 @@
 import { NextResponse } from "next/server";
 import { isAuthenticated } from "@/lib/auth";
-import { writeFile, mkdir, readdir } from "fs/promises";
-import path from "path";
 import sharp from "sharp";
 
 export const revalidate = 0;
 
-// GET: List all uploaded files in public/uploads/
+const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
+const bucketName = "wedding";
+
+// GET: List all uploaded files in Supabase Storage bucket
 export async function GET() {
   if (!(await isAuthenticated())) {
     return NextResponse.json({ message: "Não autorizado." }, { status: 401 });
   }
 
   try {
-    const uploadsDir = path.join(process.cwd(), "public", "uploads");
-    
-    try {
-      const files = await readdir(uploadsDir);
-      // Filter out system files or subdirectories, keep images
-      const imageExtensions = [".png", ".jpg", ".jpeg", ".webp", ".gif", ".svg"];
-      const imageUrls = files
-        .filter((file) => imageExtensions.includes(path.extname(file).toLowerCase()))
-        .map((file) => `/uploads/${file}`);
-        
-      return NextResponse.json(imageUrls);
-    } catch (e: any) {
-      // If folder does not exist yet
-      if (e.code === "ENOENT") {
-        return NextResponse.json([]);
-      }
-      throw e;
+    const listRes = await fetch(`${supabaseUrl}/storage/v1/object/list/${bucketName}`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${serviceRoleKey}`,
+        "apikey": serviceRoleKey,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        limit: 100,
+        sortBy: {
+          column: "created_at",
+          order: "desc",
+        },
+      }),
+    });
+
+    if (!listRes.ok) {
+      // If bucket doesn't exist yet, return empty list
+      return NextResponse.json([]);
     }
+
+    const files = await listRes.json();
+    if (!Array.isArray(files)) {
+      return NextResponse.json([]);
+    }
+
+    const imageExtensions = [".png", ".jpg", ".jpeg", ".webp", ".gif", ".svg"];
+    const imageUrls = files
+      .filter((file: any) => {
+        const ext = file.name.substring(file.name.lastIndexOf(".")).toLowerCase();
+        return imageExtensions.includes(ext);
+      })
+      .map((file: any) => `${supabaseUrl}/storage/v1/object/public/${bucketName}/${file.name}`);
+
+    return NextResponse.json(imageUrls);
   } catch (error) {
-    console.error("Error listing uploads:", error);
+    console.error("Error listing uploads from Supabase:", error);
     return NextResponse.json({ message: "Erro ao listar imagens." }, { status: 500 });
   }
 }
 
-// POST: Save and compress an uploaded image file to public/uploads/
+// POST: Save and compress an uploaded image file to Supabase Storage
 export async function POST(request: Request) {
   if (!(await isAuthenticated())) {
     return NextResponse.json({ message: "Não autorizado." }, { status: 401 });
@@ -58,7 +77,7 @@ export async function POST(request: Request) {
     // Make filename unique and convert to webp format for max compression
     const timestamp = Date.now();
     const randomStr = Math.random().toString(36).substring(2, 8);
-    const originalExt = path.extname(file.name) || ".jpg";
+    const originalExt = file.name.substring(file.name.lastIndexOf(".")).toLowerCase() || ".jpg";
     
     // Clean name: alphanumeric only, lowercase
     const cleanName = file.name
@@ -88,22 +107,51 @@ export async function POST(request: Request) {
       processedBuffer = buffer;
     }
 
-    // Target folder is public/uploads
-    const uploadsDir = path.join(process.cwd(), "public", "uploads");
-    await mkdir(uploadsDir, { recursive: true });
+    // 1. Try to create the bucket in case it doesn't exist yet (ignores error if it exists)
+    try {
+      await fetch(`${supabaseUrl}/storage/v1/bucket`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${serviceRoleKey}`,
+          "apikey": serviceRoleKey,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: bucketName,
+          name: bucketName,
+          public: true,
+          file_size_limit: 52428800, // 50MB
+          allowed_mime_types: ["image/png", "image/jpeg", "image/webp"],
+        }),
+      });
+    } catch (bucketError) {
+      console.warn("Could not create bucket programmatically:", bucketError);
+    }
 
-    // Write file to target destination
-    const filePath = path.join(uploadsDir, filename);
-    await writeFile(filePath, processedBuffer);
+    // 2. Upload the file to Supabase Storage
+    const uploadRes = await fetch(`${supabaseUrl}/storage/v1/object/${bucketName}/${filename}`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${serviceRoleKey}`,
+        "apikey": serviceRoleKey,
+        "Content-Type": "image/webp",
+      },
+      body: new Uint8Array(processedBuffer),
+    });
 
-    const relativeUrl = `/uploads/${filename}`;
-    console.log(`File uploaded and compressed successfully to: ${filePath}`);
+    if (!uploadRes.ok) {
+      const uploadErrorText = await uploadRes.text();
+      throw new Error(`Failed to upload to Supabase Storage: ${uploadErrorText}`);
+    }
 
-    return NextResponse.json({ url: relativeUrl, name: filename });
+    const publicUrl = `${supabaseUrl}/storage/v1/object/public/${bucketName}/${filename}`;
+    console.log(`File uploaded and compressed successfully to Supabase Storage: ${publicUrl}`);
+
+    return NextResponse.json({ url: publicUrl, name: filename });
   } catch (error) {
     console.error("Error writing upload file:", error);
     return NextResponse.json(
-      { message: "Erro ao salvar arquivo de imagem no servidor." },
+      { message: "Erro ao salvar arquivo de imagem no storage." },
       { status: 500 }
     );
   }
