@@ -1,62 +1,35 @@
 import { NextResponse } from "next/server";
 import { isAuthenticated } from "@/lib/auth";
+import { put, list } from "@vercel/blob";
 import sharp from "sharp";
 
 export const revalidate = 0;
 
-const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || "";
-const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
-const bucketName = "wedding";
-
-// GET: List all uploaded files in Supabase Storage bucket
+// GET: List all uploaded files in Vercel Blob
 export async function GET() {
   if (!(await isAuthenticated())) {
     return NextResponse.json({ message: "Não autorizado." }, { status: 401 });
   }
 
   try {
-    const listRes = await fetch(`${supabaseUrl}/storage/v1/object/list/${bucketName}`, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${serviceRoleKey}`,
-        "apikey": serviceRoleKey,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        limit: 100,
-        sortBy: {
-          column: "created_at",
-          order: "desc",
-        },
-      }),
-    });
-
-    if (!listRes.ok) {
-      // If bucket doesn't exist yet, return empty list
-      return NextResponse.json([]);
-    }
-
-    const files = await listRes.json();
-    if (!Array.isArray(files)) {
-      return NextResponse.json([]);
-    }
-
+    const { blobs } = await list();
+    
     const imageExtensions = [".png", ".jpg", ".jpeg", ".webp", ".gif", ".svg"];
-    const imageUrls = files
-      .filter((file: any) => {
-        const ext = file.name.substring(file.name.lastIndexOf(".")).toLowerCase();
+    const imageUrls = blobs
+      .filter((blob) => {
+        const ext = blob.pathname.substring(blob.pathname.lastIndexOf(".")).toLowerCase();
         return imageExtensions.includes(ext);
       })
-      .map((file: any) => `${supabaseUrl}/storage/v1/object/public/${bucketName}/${file.name}`);
+      .map((blob) => blob.url);
 
     return NextResponse.json(imageUrls);
   } catch (error) {
-    console.error("Error listing uploads from Supabase:", error);
+    console.error("Error listing uploads from Vercel Blob:", error);
     return NextResponse.json({ message: "Erro ao listar imagens." }, { status: 500 });
   }
 }
 
-// POST: Save and compress an uploaded image file to Supabase Storage
+// POST: Save and compress an uploaded image file to Vercel Blob
 export async function POST(request: Request) {
   if (!(await isAuthenticated())) {
     return NextResponse.json({ message: "Não autorizado." }, { status: 401 });
@@ -107,47 +80,14 @@ export async function POST(request: Request) {
       processedBuffer = buffer;
     }
 
-    // 1. Try to create the bucket in case it doesn't exist yet (ignores error if it exists)
-    try {
-      await fetch(`${supabaseUrl}/storage/v1/bucket`, {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${serviceRoleKey}`,
-          "apikey": serviceRoleKey,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          id: bucketName,
-          name: bucketName,
-          public: true,
-          file_size_limit: 52428800, // 50MB
-          allowed_mime_types: ["image/png", "image/jpeg", "image/webp"],
-        }),
-      });
-    } catch (bucketError) {
-      console.warn("Could not create bucket programmatically:", bucketError);
-    }
-
-    // 2. Upload the file to Supabase Storage
-    const uploadRes = await fetch(`${supabaseUrl}/storage/v1/object/${bucketName}/${filename}`, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${serviceRoleKey}`,
-        "apikey": serviceRoleKey,
-        "Content-Type": "image/webp",
-      },
-      body: new Uint8Array(processedBuffer),
+    // Upload directly to Vercel Blob Storage with public access
+    const blob = await put(filename, processedBuffer, {
+      access: "public",
     });
 
-    if (!uploadRes.ok) {
-      const uploadErrorText = await uploadRes.text();
-      throw new Error(`Failed to upload to Supabase Storage: ${uploadErrorText}`);
-    }
+    console.log(`File uploaded successfully to Vercel Blob: ${blob.url}`);
 
-    const publicUrl = `${supabaseUrl}/storage/v1/object/public/${bucketName}/${filename}`;
-    console.log(`File uploaded and compressed successfully to Supabase Storage: ${publicUrl}`);
-
-    return NextResponse.json({ url: publicUrl, name: filename });
+    return NextResponse.json({ url: blob.url, name: filename });
   } catch (error) {
     console.error("Error writing upload file:", error);
     return NextResponse.json(
