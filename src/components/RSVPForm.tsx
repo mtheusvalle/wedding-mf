@@ -286,12 +286,113 @@ export default function RSVPForm({ initialGuest, weddingConfig }: RSVPFormProps)
           
           /* STATE 2: RSVP FORM */
           <div>
-            <h3 style={{ fontFamily: "var(--font-serif)", fontSize: "1.5rem", marginBottom: "0.5rem", color: "var(--color-primary-dark)" }}>
+            <h3 style={{
+              fontFamily: "var(--font-serif)",
+              fontSize: "1.6rem",
+              marginBottom: "1.5rem",
+              textAlign: "center",
+              color: "var(--color-primary-dark)"
+            }}>
               Olá, {guest.name}!
             </h3>
-            <p style={{ color: "var(--color-text-muted)", fontSize: "0.85rem", marginBottom: "2rem" }}>
-              Código do convite: <strong>{guest.code}</strong>
-            </p>
+
+            {/* Elegant Digital Invitation Card */}
+            <div style={{
+              border: "1px solid var(--color-border)",
+              backgroundColor: "var(--color-bg)",
+              padding: "2.5rem 1.5rem",
+              borderRadius: "8px",
+              textAlign: "center",
+              marginBottom: "2.5rem",
+              boxShadow: "var(--shadow-sm)",
+            }}>
+              <p style={{
+                fontFamily: "var(--font-serif)",
+                fontStyle: "italic",
+                fontSize: "0.95rem",
+                color: "var(--color-text-muted)",
+                lineHeight: "1.6",
+                marginBottom: "0.25rem"
+              }}>
+                “Por isso deixará o homem o seu pai e a sua mãe, e se unirá à sua mulher, e serão uma só carne.”
+              </p>
+              <p style={{
+                fontSize: "0.75rem",
+                textTransform: "uppercase",
+                letterSpacing: "0.1em",
+                color: "var(--color-primary-dark)",
+                marginBottom: "1.5rem"
+              }}>
+                Gênesis 2:24
+              </p>
+
+              <div style={{
+                width: "40px",
+                height: "1px",
+                backgroundColor: "var(--color-border)",
+                margin: "0 auto 1.5rem auto"
+              }} />
+
+              <p style={{
+                fontSize: "0.85rem",
+                color: "var(--color-text-muted)",
+                lineHeight: "1.6",
+                marginBottom: "1.5rem"
+              }}>
+                Com a bênção de Deus e de nossos pais,<br />
+                convidamos você para celebrar conosco o início de uma nova história.
+              </p>
+
+              <h4 style={{
+                fontFamily: "var(--font-serif)",
+                fontSize: "1.8rem",
+                letterSpacing: "0.15em",
+                color: "var(--color-primary)",
+                margin: "1.5rem 0",
+                fontWeight: "500"
+              }}>
+                {weddingConfig.brideName.toUpperCase()} & {weddingConfig.groomName.toUpperCase()}
+              </h4>
+
+              <p style={{
+                fontFamily: "var(--font-serif)",
+                fontSize: "1.1rem",
+                color: "var(--color-text-main)",
+                marginBottom: "0.25rem",
+                fontWeight: "500"
+              }}>
+                {new Intl.DateTimeFormat("pt-BR", {
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric",
+                  timeZone: "America/Sao_Paulo",
+                }).format(new Date(weddingConfig.weddingDate))}
+              </p>
+              <p style={{
+                fontSize: "0.9rem",
+                color: "var(--color-text-muted)",
+                marginBottom: "1.5rem"
+              }}>
+                Às {weddingTimeFormatted}h
+              </p>
+
+              <div style={{
+                width: "40px",
+                height: "1px",
+                backgroundColor: "var(--color-border)",
+                margin: "0 auto 1.5rem auto"
+              }} />
+
+              <p style={{
+                fontSize: "0.85rem",
+                fontStyle: "italic",
+                color: "var(--color-text-muted)",
+                lineHeight: "1.6"
+              }}>
+                Será um dia muito especial, preparado com amor,<br />
+                e a sua presença tornará esse momento ainda mais inesquecível.
+              </p>
+            </div>
 
             <form onSubmit={handleSubmit}>
               <div className="form-group">
@@ -331,7 +432,7 @@ export default function RSVPForm({ initialGuest, weddingConfig }: RSVPFormProps)
               {status === "CONFIRMED" && (
                 <div className="form-group">
                   <label className="form-label" htmlFor="additional-count">
-                    Quantos acompanhantes trará com você? (Apenas quantidade)
+                    Quantos acompanhantes trará com você?
                   </label>
                   <input
                     type="number"
