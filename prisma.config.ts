@@ -9,6 +9,11 @@ export default defineConfig({
   },
   datasource: {
     // For migrations (Prisma CLI), we must use the direct connection URL (port 5432)
-    url: process.env["DIRECT_URL"] || process.env["DATABASE_URL"],
+    url: process.env["DIRECT_URL"] || 
+         process.env["POSTGRES_URL_NON_POOLING"] || 
+         process.env["DATABASE_POSTGRES_URL_NON_POOLING"] || 
+         process.env["DATABASE_URL"] || 
+         process.env["POSTGRES_PRISMA_URL"] || 
+         process.env["DATABASE_POSTGRES_PRISMA_URL"],
   },
 });
