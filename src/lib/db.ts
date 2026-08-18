@@ -2,10 +2,8 @@ import pg from "pg";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@/generated/prisma/client";
 
-// Bypass local SSL certificate validation to prevent chain errors on developer machines
-if (!process.env.VERCEL) {
-  process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-}
+// Bypass SSL certificate validation to prevent chain errors in both local development and Vercel environments
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
 // Decodes a local prisma+postgres:// connection string into the actual direct postgres:// URL.
 function getDirectDatabaseUrl(urlStr: string): string {
