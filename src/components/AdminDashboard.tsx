@@ -660,7 +660,7 @@ export default function AdminDashboard({
           boxShadow: "var(--shadow-sm)",
         }}
       >
-        <div className="container" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div className="container container-admin" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <h1 style={{ fontFamily: "var(--font-serif)", fontSize: "1.5rem", color: "var(--color-primary-dark)" }}>
             Painel do Casamento 💖
           </h1>
@@ -686,7 +686,7 @@ export default function AdminDashboard({
       </header>
 
       {/* Main Grid Layout */}
-      <div className="container" style={{ padding: "2.5rem 0" }}>
+      <div className="container container-admin" style={{ padding: "2.5rem 0" }}>
         
         {/* Navigation Tabs */}
         <div
@@ -882,8 +882,8 @@ export default function AdminDashboard({
                     <th>Nome</th>
                     <th>Telefone</th>
                     <th>Link Convite</th>
-                    <th>Acomp. Permitidos</th>
-                    <th>Acomp. Confirmados</th>
+                    <th>Acomp. Máx</th>
+                    <th>Acomp. Conf.</th>
                     <th>Status</th>
                     <th>Mensagem / Observação</th>
                     <th>Ações</th>
