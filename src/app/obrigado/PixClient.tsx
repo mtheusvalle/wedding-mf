@@ -3,14 +3,14 @@
 import { useState } from "react";
 
 interface PixClientProps {
-  pixKey: string;
+  pixCode: string;
 }
 
-export default function PixClient({ pixKey }: PixClientProps) {
+export default function PixClient({ pixCode }: PixClientProps) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(pixKey);
+    navigator.clipboard.writeText(pixCode);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -33,14 +33,17 @@ export default function PixClient({ pixKey }: PixClientProps) {
         <span
           style={{
             fontFamily: "monospace",
-            fontSize: "0.95rem",
+            fontSize: "0.85rem", // Slightly smaller monospace to fit the longer Pix code nicely
             color: "var(--color-text-main)",
             wordBreak: "break-all",
             textAlign: "left",
             flexGrow: 1,
+            maxHeight: "80px",
+            overflowY: "auto",
+            paddingRight: "0.5rem"
           }}
         >
-          {pixKey}
+          {pixCode}
         </span>
         <button
           type="button"
@@ -58,7 +61,7 @@ export default function PixClient({ pixKey }: PixClientProps) {
         </button>
       </div>
       <p style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", fontStyle: "italic" }}>
-        Copie a chave acima e faça a transferência no aplicativo do seu banco de preferência.
+        Copie o código "Copia e Cola" acima e faça o pagamento no aplicativo do seu banco de preferência.
       </p>
     </div>
   );

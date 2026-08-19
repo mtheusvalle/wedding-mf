@@ -2,6 +2,7 @@ import { prisma } from "@/lib/db";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import PixClient from "./PixClient";
+import { generatePixPayload } from "@/lib/pix";
 import type { Metadata } from "next";
 
 export const revalidate = 0;
@@ -69,6 +70,20 @@ export default async function ThankYouPage({ searchParams }: PageProps) {
     };
   }
 
+  // Generate the dynamic Pix Copia e Cola Code
+  const pixKey = config.pixKey || "seu-pix@email.com";
+  const amountBRL = transaction.amount / 100;
+  const bride = config.brideName || "Noiva";
+  const groom = config.groomName || "Noivo";
+  const merchantName = `${bride} e ${groom}`;
+  
+  const pixCode = generatePixPayload({
+    key: pixKey,
+    amount: amountBRL,
+    merchantName: merchantName,
+    txId: transaction.id.replace(/-/g, "").substring(0, 20),
+  });
+
   const formattedAmount = new Intl.NumberFormat("pt-BR", {
     style: "currency",
     currency: "BRL",
@@ -104,32 +119,30 @@ export default async function ThankYouPage({ searchParams }: PageProps) {
                 Olá, <strong>{transaction.buyerName}</strong>! Para confirmar sua contribuição de <strong>{formattedAmount}</strong> para o presente <strong>{transaction.gift.name}</strong>, faça a transferência Pix:
               </p>
 
-              {/* QR Code image display */}
-              {config.pixQrCode && (
-                <div style={{ marginBottom: "1.5rem" }}>
-                  <img
-                    src={config.pixQrCode}
-                    alt="QRCode Pix"
-                    style={{
-                      width: "220px",
-                      height: "220px",
-                      objectFit: "contain",
-                      margin: "0 auto",
-                      display: "block",
-                      border: "1px solid var(--color-border)",
-                      padding: "0.5rem",
-                      borderRadius: "6px",
-                      backgroundColor: "var(--color-white)"
-                    }}
-                  />
-                  <span style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginTop: "0.5rem", display: "block" }}>
-                    Abra o app do seu banco e escaneie o código acima
-                  </span>
-                </div>
-              )}
+              {/* Dynamic QR Code generated from our API */}
+              <div style={{ marginBottom: "1.5rem" }}>
+                <img
+                  src={`/api/gifts/pix-qrcode?transactionId=${transaction.id}`}
+                  alt="QRCode Pix"
+                  style={{
+                    width: "220px",
+                    height: "220px",
+                    objectFit: "contain",
+                    margin: "0 auto",
+                    display: "block",
+                    border: "1px solid var(--color-border)",
+                    padding: "0.5rem",
+                    borderRadius: "6px",
+                    backgroundColor: "var(--color-white)"
+                  }}
+                />
+                <span style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginTop: "0.5rem", display: "block" }}>
+                  Abra o app do seu banco e escaneie o código acima
+                </span>
+              </div>
 
-              {/* Pix Copy and paste key component */}
-              <PixClient pixKey={config.pixKey} />
+              {/* Dynamic Pix Copy and paste key component */}
+              <PixClient pixCode={pixCode} />
 
               <div
                 style={{
