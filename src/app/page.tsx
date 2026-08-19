@@ -45,11 +45,11 @@ export default async function Home() {
     };
   }
 
-  // 2. Fetch active gifts from database (limit to 6 for landing page)
+  // 2. Fetch active gifts from database (limit to 8 for landing page)
   const gifts = await prisma.gift.findMany({
     where: { active: true },
     orderBy: { price: "asc" },
-    take: 6,
+    take: 8,
   });
 
   // 3. Fetch active gallery images from database
