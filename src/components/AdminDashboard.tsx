@@ -322,6 +322,54 @@ export default function AdminDashboard({
     }
   };
 
+  // --- IMAGE PASTE HELPER ---
+  const handleImagePaste = async (
+    e: React.ClipboardEvent<HTMLInputElement>,
+    onUploadSuccess: (url: string) => void
+  ) => {
+    const items = e.clipboardData.items;
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].type.indexOf("image") !== -1) {
+        const file = items[i].getAsFile();
+        if (file) {
+          e.preventDefault();
+          setErrorMsg(null);
+          setLoading(true);
+
+          try {
+            // Compress image client side
+            const compressedBlob = await compressImage(file);
+            const compressedFile = new File([compressedBlob], `pasted-image-${Date.now()}.webp`, { type: "image/webp" });
+
+            const formData = new FormData();
+            formData.append("file", compressedFile);
+
+            const res = await fetch("/api/admin/upload", {
+              method: "POST",
+              body: formData,
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+              throw new Error(data.message || "Erro ao fazer upload do arquivo colado.");
+            }
+
+            if (data.url) {
+              onUploadSuccess(data.url);
+            }
+          } catch (err: any) {
+            setErrorMsg(err.message || "Falha no upload da imagem colada.");
+            alert(err.message || "Falha no upload da imagem colada.");
+          } finally {
+            setLoading(false);
+          }
+        }
+        break;
+      }
+    }
+  };
+
   // --- GUEST CRUD OPERATIONS ---
   const openAddGuestModal = () => {
     setEditingGuest(null);
@@ -1856,15 +1904,16 @@ export default function AdminDashboard({
               </div>
 
               <div className="form-group">
-                <label className="form-label" htmlFor="gift-image">URL da Imagem *</label>
+                <label className="form-label" htmlFor="gift-image">Imagem do Presente *</label>
                 <div style={{ display: "flex", gap: "0.5rem" }}>
                   <input
                     type="text"
                     id="gift-image"
                     className="form-control"
-                    placeholder="URL da imagem (ex: https://images.unsplash.com/...)"
+                    placeholder="Cole a URL ou aperte Ctrl+V com uma imagem copiada..."
                     value={giftForm.image}
                     onChange={(e) => setGiftForm({ ...giftForm, image: e.target.value })}
+                    onPaste={(e) => handleImagePaste(e, (url) => setGiftForm({ ...giftForm, image: url }))}
                     style={{ flexGrow: 1 }}
                     required
                   />
@@ -1884,6 +1933,25 @@ export default function AdminDashboard({
                     📤 Upload
                   </button>
                 </div>
+                {giftForm.image && (
+                  <div style={{ marginTop: "0.75rem", textAlign: "center" }}>
+                    <p style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginBottom: "0.5rem", textAlign: "left" }}>
+                      Prévia do Presente:
+                    </p>
+                    <img
+                      src={giftForm.image}
+                      alt="Prévia do Presente"
+                      style={{
+                        maxWidth: "100%",
+                        maxHeight: "150px",
+                        borderRadius: "6px",
+                        objectFit: "cover",
+                        border: "1px solid var(--color-border)",
+                        boxShadow: "var(--shadow-sm)"
+                      }}
+                    />
+                  </div>
+                )}
               </div>
 
               <div className="form-group">
@@ -1947,9 +2015,10 @@ export default function AdminDashboard({
                     type="text"
                     id="gallery-image-url"
                     className="form-control"
-                    placeholder="Cole a URL ou faça upload da foto..."
+                    placeholder="Cole a URL ou aperte Ctrl+V com uma imagem copiada..."
                     value={galleryForm.url}
                     onChange={(e) => setGalleryForm({ ...galleryForm, url: e.target.value })}
+                    onPaste={(e) => handleImagePaste(e, (url) => setGalleryForm({ ...galleryForm, url }))}
                     style={{ flexGrow: 1 }}
                     required
                   />
@@ -1969,6 +2038,25 @@ export default function AdminDashboard({
                     📤 Upload
                   </button>
                 </div>
+                {galleryForm.url && (
+                  <div style={{ marginTop: "0.75rem", textAlign: "center" }}>
+                    <p style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginBottom: "0.5rem", textAlign: "left" }}>
+                      Prévia da Foto:
+                    </p>
+                    <img
+                      src={galleryForm.url}
+                      alt="Prévia Galeria"
+                      style={{
+                        maxWidth: "100%",
+                        maxHeight: "150px",
+                        borderRadius: "6px",
+                        objectFit: "cover",
+                        border: "1px solid var(--color-border)",
+                        boxShadow: "var(--shadow-sm)"
+                      }}
+                    />
+                  </div>
+                )}
               </div>
 
               <div className="form-group">
