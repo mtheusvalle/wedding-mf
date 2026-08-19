@@ -702,16 +702,28 @@ export default function AdminDashboard({
   // Search/Filters states
   const [guestSearch, setGuestSearch] = useState("");
   const [guestFilter, setGuestFilter] = useState<"ALL" | "CONFIRMED" | "PENDING" | "DECLINED">("ALL");
+  const [phoneFilter, setPhoneFilter] = useState<"ALL" | "WITH_PHONE" | "WITHOUT_PHONE">("ALL");
+  const [messageFilter, setMessageFilter] = useState<"ALL" | "WITH_MESSAGE" | "WITHOUT_MESSAGE">("ALL");
 
   const filteredGuests = guests.filter((g) => {
     const matchesSearch =
       g.name.toLowerCase().includes(guestSearch.toLowerCase()) ||
       g.phone.includes(guestSearch);
 
-    const matchesFilter =
+    const matchesStatus =
       guestFilter === "ALL" || g.status === guestFilter;
 
-    return matchesSearch && matchesFilter;
+    const matchesPhone =
+      phoneFilter === "ALL" ||
+      (phoneFilter === "WITH_PHONE" && g.phone && g.phone.trim() !== "") ||
+      (phoneFilter === "WITHOUT_PHONE" && (!g.phone || g.phone.trim() === ""));
+
+    const matchesMessage =
+      messageFilter === "ALL" ||
+      (messageFilter === "WITH_MESSAGE" && g.notes && g.notes.trim() !== "") ||
+      (messageFilter === "WITHOUT_MESSAGE" && (!g.notes || g.notes.trim() === ""));
+
+    return matchesSearch && matchesStatus && matchesPhone && matchesMessage;
   });
 
   return (
@@ -896,27 +908,49 @@ export default function AdminDashboard({
         {/* --- TAB 2: GUESTS (RSVP CONTROL) --- */}
         {activeTab === "guests" && (
           <div>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "1rem", marginBottom: "2rem" }}>
-              <div className="admin-search-bar" style={{ display: "flex", gap: "1rem", flexGrow: 1, maxWidth: "500px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "1rem", marginBottom: "2rem", width: "100%" }}>
+              <div className="admin-search-bar" style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap", flexGrow: 1 }}>
                 <input
                   type="text"
                   placeholder="Pesquisar por nome ou telefone..."
                   className="form-control"
                   value={guestSearch}
                   onChange={(e) => setGuestSearch(e.target.value)}
-                  style={{ flexGrow: 1 }}
+                  style={{ minWidth: "220px", flex: "1 1 200px" }}
                 />
                 
                 <select
                   className="form-control"
                   value={guestFilter}
                   onChange={(e) => setGuestFilter(e.target.value as any)}
-                  style={{ width: "180px" }}
+                  style={{ width: "160px", flex: "0 1 auto" }}
                 >
                   <option value="ALL">Todos os Status</option>
                   <option value="CONFIRMED">Confirmados</option>
                   <option value="PENDING">Pendentes</option>
                   <option value="DECLINED">Não Comparecem</option>
+                </select>
+
+                <select
+                  className="form-control"
+                  value={phoneFilter}
+                  onChange={(e) => setPhoneFilter(e.target.value as any)}
+                  style={{ width: "160px", flex: "0 1 auto" }}
+                >
+                  <option value="ALL">Todos os Contatos</option>
+                  <option value="WITH_PHONE">Com Telefone</option>
+                  <option value="WITHOUT_PHONE">Sem Telefone</option>
+                </select>
+
+                <select
+                  className="form-control"
+                  value={messageFilter}
+                  onChange={(e) => setMessageFilter(e.target.value as any)}
+                  style={{ width: "160px", flex: "0 1 auto" }}
+                >
+                  <option value="ALL">Todos os Recados</option>
+                  <option value="WITH_MESSAGE">Com Recado</option>
+                  <option value="WITHOUT_MESSAGE">Sem Recado</option>
                 </select>
               </div>
 
@@ -949,7 +983,6 @@ export default function AdminDashboard({
                     <th>Nome</th>
                     <th>Telefone</th>
                     <th>Link Convite</th>
-                    <th>Acomp. Máx</th>
                     <th>Acomp. Conf.</th>
                     <th>Status</th>
                     <th>Mensagem / Observação</th>
@@ -959,7 +992,7 @@ export default function AdminDashboard({
                 <tbody>
                   {filteredGuests.length === 0 ? (
                     <tr>
-                      <td colSpan={8} style={{ textAlign: "center", color: "var(--color-text-muted)", padding: "2rem" }}>
+                      <td colSpan={7} style={{ textAlign: "center", color: "var(--color-text-muted)", padding: "2rem" }}>
                         Nenhum convidado localizado.
                       </td>
                     </tr>
@@ -989,7 +1022,6 @@ export default function AdminDashboard({
                             <code style={{ fontSize: "0.8rem", color: "var(--color-primary-dark)" }}>/{g.code}</code>
                           )}
                         </td>
-                        <td style={{ textAlign: "center" }}>{g.allowedAdditionalGuests}</td>
                         <td style={{ textAlign: "center" }}>
                           {g.status === "CONFIRMED" ? g.confirmedAdditionalGuests : "-"}
                         </td>
@@ -1713,20 +1745,6 @@ export default function AdminDashboard({
                   O link gerado será: seu-site.com/confirmar-presenca/<strong>{guestForm.code || "[codigo]"}</strong>
                 </p>
               </div>
-
-              <div className="form-group">
-                <label className="form-label" htmlFor="guest-allowed">Acompanhantes Permitidos *</label>
-                <input
-                  type="number"
-                  id="guest-allowed"
-                  className="form-control"
-                  min="0"
-                  value={guestForm.allowedAdditionalGuests}
-                  onChange={(e) => setGuestForm({ ...guestForm, allowedAdditionalGuests: parseInt(e.target.value || "0", 10) })}
-                  required
-                />
-              </div>
-
               {editingGuest && (
                 <div style={{ borderTop: "1px solid var(--color-border)", paddingTop: "1rem", marginTop: "1rem" }}>
                   <div className="form-group">
@@ -1752,7 +1770,6 @@ export default function AdminDashboard({
                           id="guest-confirmed-acomp"
                           className="form-control"
                           min="0"
-                          max={guestForm.allowedAdditionalGuests}
                           value={guestForm.confirmedAdditionalGuests}
                           onChange={(e) => setGuestForm({ ...guestForm, confirmedAdditionalGuests: parseInt(e.target.value || "0", 10) })}
                         />

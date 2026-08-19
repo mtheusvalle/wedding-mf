@@ -76,7 +76,7 @@ export default async function ThankYouPage({ searchParams }: PageProps) {
   const bride = config.brideName || "Noiva";
   const groom = config.groomName || "Noivo";
   const merchantName = `${bride} e ${groom}`;
-  
+
   const pixCode = generatePixPayload({
     key: pixKey,
     amount: amountBRL,
@@ -105,16 +105,16 @@ export default async function ThankYouPage({ searchParams }: PageProps) {
     >
       <div className="container" style={{ maxWidth: "550px", textAlign: "center" }}>
         <div className="card" style={{ padding: "3rem 2.25rem" }}>
-          
+
           {isPending ? (
             /* --- STATE 1: PENDING PIX --- */
             <div>
               <div style={{ fontSize: "4.5rem", marginBottom: "1rem" }}>⏳💝</div>
-              
+
               <h2 style={{ fontFamily: "var(--font-serif)", fontSize: "1.8rem", color: "var(--color-primary-dark)", marginBottom: "1rem" }}>
                 Quase lá!
               </h2>
-              
+
               <p style={{ fontSize: "1.05rem", color: "var(--color-text-main)", marginBottom: "1.5rem" }}>
                 Olá, <strong>{transaction.buyerName}</strong>! Para confirmar sua contribuição de <strong>{formattedAmount}</strong> para o presente <strong>{transaction.gift.name}</strong>, faça a transferência Pix:
               </p>
@@ -159,7 +159,6 @@ export default async function ThankYouPage({ searchParams }: PageProps) {
                 <h4 style={{ fontWeight: 600, color: "var(--color-text-main)", marginBottom: "0.5rem" }}>Instruções:</h4>
                 <ul style={{ paddingLeft: "1.25rem", display: "flex", flexDirection: "column", gap: "0.4rem" }}>
                   <li>Copie a chave Pix acima ou escaneie o QR Code.</li>
-                  <li>Insira o valor exato de <strong>{formattedAmount}</strong>.</li>
                   <li>Realize a transferência bancária.</li>
                   <li>Não é necessário enviar comprovante. O casal confirmará manualmente o recebimento no painel!</li>
                 </ul>
@@ -173,11 +172,11 @@ export default async function ThankYouPage({ searchParams }: PageProps) {
             /* --- STATE 2: PAID SUCCESS --- */
             <div>
               <div style={{ fontSize: "5rem", marginBottom: "1.5rem" }}>🎁❤️</div>
-              
+
               <h2 style={{ fontFamily: "var(--font-serif)", fontSize: "2rem", color: "var(--color-primary-dark)", marginBottom: "1rem" }}>
                 Muito Obrigado!
               </h2>
-              
+
               <p style={{ fontSize: "1.1rem", color: "var(--color-text-main)", marginBottom: "1.5rem" }}>
                 Olá, <strong>{transaction.buyerName}</strong>! Confirmamos com sucesso o recebimento da sua contribuição de <strong>{formattedAmount}</strong> para <strong>{transaction.gift.name}</strong>.
               </p>
