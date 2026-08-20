@@ -284,7 +284,7 @@ export default async function Home() {
             Feito com <span className={styles.footerHeart}>❤️</span> para celebrar este grande dia.
           </p>
           <p style={{ fontSize: "0.75rem", marginTop: "1rem", opacity: "0.6" }}>
-            © {new Date().getFullYear()} Maria & João. Todos os direitos reservados.
+            © {new Date().getFullYear()} Todos os direitos reservados.
           </p>
         </div>
       </footer>
