@@ -26,17 +26,25 @@ export async function generateMetadata(): Promise<Metadata> {
   const groom = config?.groomName || "João";
   const title = `Casamento de ${bride} & ${groom}`;
 
+  const defaultImage = "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&q=80&w=1200";
+  let imageUrl = config?.heroImage || defaultImage;
+
+  // Metadata images must have absolute URLs
+  if (imageUrl.startsWith("/")) {
+    imageUrl = `https://wedding-mf.vercel.app${imageUrl}`;
+  }
+
   return {
     title,
     description: `Acompanhe todos os detalhes do nosso grande dia, confirme sua presença e confira nossa lista de presentes de ${bride} & ${groom}.`,
     openGraph: {
       title,
       description: `Você está convidado para celebrar esse momento conosco! Acesse para ver a programação, confirmar sua presença e ver a lista de presentes de ${bride} & ${groom}.`,
-      url: "https://nosso-casamento.vercel.app",
+      url: "https://wedding-mf.vercel.app",
       siteName: `${bride} & ${groom}`,
       images: [
         {
-          url: "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&q=80&w=1200",
+          url: imageUrl,
           width: 1200,
           height: 630,
           alt: `Casamento de ${bride} & ${groom}`,
@@ -49,7 +57,7 @@ export async function generateMetadata(): Promise<Metadata> {
       card: "summary_large_image",
       title,
       description: `Você está convidado para celebrar esse momento conosco! Acesse para ver a programação, confirmar sua presença e ver a lista de presentes de ${bride} & ${groom}.`,
-      images: ["https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&q=80&w=1200"],
+      images: [imageUrl],
     },
   };
 }
