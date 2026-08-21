@@ -31,7 +31,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
   // Metadata images must have absolute URLs
   if (imageUrl.startsWith("/")) {
-    imageUrl = `https://wedding-mf.vercel.app${imageUrl}`;
+    imageUrl = `https://flaviaematheus.site${imageUrl}`;
   }
 
   return {
@@ -40,7 +40,7 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       title,
       description: `Você está convidado para celebrar esse momento conosco! Acesse para ver a programação, confirmar sua presença e ver a lista de presentes de ${bride} & ${groom}.`,
-      url: "https://wedding-mf.vercel.app",
+      url: "https://flaviaematheus.site",
       siteName: `${bride} & ${groom}`,
       images: [
         {
