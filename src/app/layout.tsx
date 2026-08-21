@@ -26,7 +26,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const groom = config?.groomName || "João";
   const title = `Casamento de ${bride} & ${groom}`;
 
-  const defaultImage = "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&q=80&w=1200";
+  const defaultImage = "https://flaviaematheus.site/api/admin/upload/view?pathname=1787075487567-dsc-3402-fnf8e8.webp";
   let imageUrl = config?.heroImage || defaultImage;
 
   // Metadata images must have absolute URLs
