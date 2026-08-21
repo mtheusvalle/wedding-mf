@@ -106,6 +106,7 @@ export default function AdminDashboard({
   // Copy success message status
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [copiedPhoneId, setCopiedPhoneId] = useState<string | null>(null);
+  const [copiedMsgId, setCopiedMsgId] = useState<string | null>(null);
 
   // Refs for hidden file inputs to trigger uploads
   const configUploadRef = useRef<HTMLInputElement>(null);
@@ -188,6 +189,38 @@ export default function AdminDashboard({
     navigator.clipboard.writeText(phone);
     setCopiedPhoneId(guestId);
     setTimeout(() => setCopiedPhoneId(null), 2000);
+  };
+
+  // Helper dynamic WhatsApp message
+  const getWhatsAppMessage = (guestName: string, guestCode: string) => {
+    const inviteLink = `${window.location.origin}/confirmar-presenca/${guestCode}`;
+    return `${guestName},\n\nÉ com o coração cheio de carinho que nós convidamos você e sua família para celebrarmos juntos o nosso casamento, no dia 24/10.  ❤️\n\nA sua presença vai deixar o nosso dia ainda mais especial!\n\nTodos os detalhes e a confirmação de presença estão no nosso site: ${inviteLink}`;
+  };
+
+  // Copy WhatsApp message to clipboard
+  const copyWhatsAppMessage = (guestName: string, guestCode: string, guestId: string) => {
+    const msg = getWhatsAppMessage(guestName, guestCode);
+    navigator.clipboard.writeText(msg);
+    setCopiedMsgId(guestId);
+    setTimeout(() => setCopiedMsgId(null), 2000);
+  };
+
+  // Open WhatsApp Web/API with pre-filled message
+  const sendWhatsAppMessage = (phone: string, guestName: string, guestCode: string) => {
+    const msg = getWhatsAppMessage(guestName, guestCode);
+    const cleanPhone = phone.replace(/\D/g, "");
+    
+    let url = "";
+    if (cleanPhone) {
+      let finalPhone = cleanPhone;
+      if (cleanPhone.length >= 10 && !cleanPhone.startsWith("55")) {
+        finalPhone = `55${cleanPhone}`;
+      }
+      url = `https://api.whatsapp.com/send?phone=${finalPhone}&text=${encodeURIComponent(msg)}`;
+    } else {
+      url = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
+    }
+    window.open(url, "_blank");
   };
 
   // --- REFRESH DATA API ---
@@ -1097,18 +1130,36 @@ export default function AdminDashboard({
                           )}
                         </td>
                         <td>
-                          <div style={{ display: "flex", gap: "0.5rem" }}>
+                          <div style={{ display: "flex", gap: "0.4rem", flexWrap: "nowrap" }}>
                             <button
                               className="btn btn-outline btn-sm"
                               style={{ padding: "0.3rem 0.6rem" }}
                               onClick={() => openEditGuestModal(g)}
+                              title="Editar Convidado"
                             >
                               ✏️
                             </button>
                             <button
                               className="btn btn-outline btn-sm"
+                              style={{ padding: "0.3rem 0.6rem", borderColor: "var(--color-success)", color: "var(--color-success)" }}
+                              onClick={() => copyWhatsAppMessage(g.name, g.code, g.id)}
+                              title="Copiar mensagem do WhatsApp"
+                            >
+                              {copiedMsgId === g.id ? "Copiado!" : "📋 Convite"}
+                            </button>
+                            <button
+                              className="btn btn-primary btn-sm"
+                              style={{ padding: "0.3rem 0.6rem", backgroundColor: "#25D366", borderColor: "#25D366", color: "#fff" }}
+                              onClick={() => sendWhatsAppMessage(g.phone, g.name, g.code)}
+                              title="Enviar no WhatsApp"
+                            >
+                              💬 Enviar
+                            </button>
+                            <button
+                              className="btn btn-outline btn-sm"
                               style={{ padding: "0.3rem 0.6rem", borderColor: "var(--color-danger)", color: "var(--color-danger)" }}
                               onClick={() => handleDeleteGuest(g.id)}
+                              title="Excluir Convidado"
                             >
                               🗑️
                             </button>
