@@ -37,7 +37,7 @@ interface RSVPFormProps {
 
 export default function RSVPForm({ initialGuest, weddingConfig }: RSVPFormProps) {
   const router = useRouter();
-  
+
   const [guest, setGuest] = useState<Guest | null>(initialGuest);
   const [searchCode, setSearchCode] = useState("");
   const [searchError, setSearchError] = useState<string | null>(null);
@@ -48,7 +48,7 @@ export default function RSVPForm({ initialGuest, weddingConfig }: RSVPFormProps)
   const [additionalCount, setAdditionalCount] = useState<number | string>(0);
   const [notes, setNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  
+
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [redirectTimer, setRedirectTimer] = useState<number | null>(null);
 
@@ -155,7 +155,7 @@ export default function RSVPForm({ initialGuest, weddingConfig }: RSVPFormProps)
     year: "numeric",
     timeZone: "America/Sao_Paulo",
   }).format(new Date(weddingConfig.weddingDate));
-  
+
   const weddingTimeFormatted = new Intl.DateTimeFormat("pt-BR", {
     hour: "2-digit",
     minute: "2-digit",
@@ -183,7 +183,7 @@ export default function RSVPForm({ initialGuest, weddingConfig }: RSVPFormProps)
   return (
     <div style={{ maxWidth: "600px", margin: "0 auto" }}>
       <div className={styles.card} style={{ padding: "2.5rem" }}>
-        
+
         {/* STATE 1: SEARCH GUEST */}
         {!guest ? (
           <div>
@@ -226,7 +226,7 @@ export default function RSVPForm({ initialGuest, weddingConfig }: RSVPFormProps)
             </form>
           </div>
         ) : (
-          
+
           /* STATE 2: RSVP FORM */
           <div>
             <h3 style={{
@@ -459,7 +459,7 @@ export default function RSVPForm({ initialGuest, weddingConfig }: RSVPFormProps)
                   id="rsvp-notes"
                   className="form-control"
                   rows={3}
-                  placeholder="Deixe uma mensagem ou informe restrições alimentares (opcional)"
+                  placeholder="Deixe uma mensagem para os noivos (opcional)"
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   disabled={submitting}
@@ -488,7 +488,7 @@ export default function RSVPForm({ initialGuest, weddingConfig }: RSVPFormProps)
                     Voltar
                   </button>
                 )}
-                
+
                 <button
                   type="submit"
                   className="btn btn-primary"
