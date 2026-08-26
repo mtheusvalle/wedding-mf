@@ -132,6 +132,7 @@ export default function AdminDashboard({
   });
 
   const [importingGuests, setImportingGuests] = useState(false);
+  const [viewingMessage, setViewingMessage] = useState<{ guestName: string; message: string } | null>(null);
 
   // --- TAB 3: GIFT MODAL STATES ---
   const [giftModalOpen, setGiftModalOpen] = useState(false);
@@ -1121,8 +1122,24 @@ export default function AdminDashboard({
                             {g.status === "PENDING" && "Pendente"}
                           </span>
                         </td>
-                        <td style={{ maxWidth: "200px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={g.notes || ""}>
-                          {g.notes || <span style={{ opacity: 0.3 }}>Nenhuma</span>}
+                        <td
+                          style={{
+                            maxWidth: "200px",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            whiteSpace: "nowrap",
+                            cursor: g.notes ? "pointer" : "default",
+                          }}
+                          title={g.notes ? "Clique para ler a mensagem completa" : ""}
+                          onClick={() => g.notes && setViewingMessage({ guestName: g.name, message: g.notes })}
+                        >
+                          {g.notes ? (
+                            <span style={{ textDecoration: "underline", color: "var(--color-primary)" }}>
+                              {g.notes}
+                            </span>
+                          ) : (
+                            <span style={{ opacity: 0.3 }}>Nenhuma</span>
+                          )}
                           {g.confirmedNames && (
                             <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginTop: "0.25rem" }}>
                               Acomp: {g.confirmedNames}
@@ -2249,6 +2266,43 @@ export default function AdminDashboard({
                 ))}
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* --- GUEST MESSAGE DIALOG --- */}
+      {viewingMessage && (
+        <div className="modal-overlay" onClick={() => setViewingMessage(null)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: "550px" }}>
+            <button className="modal-close" onClick={() => setViewingMessage(null)}>
+              &times;
+            </button>
+            <h3 style={{ fontFamily: "var(--font-serif)", fontSize: "1.5rem", marginBottom: "1rem", color: "var(--color-primary-dark)" }}>
+              Mensagem de {viewingMessage.guestName}
+            </h3>
+            <div
+              style={{
+                backgroundColor: "var(--color-bg-alt)",
+                border: "1px solid var(--color-border)",
+                borderRadius: "6px",
+                padding: "1.5rem",
+                fontSize: "1.1rem",
+                color: "var(--color-text-main)",
+                lineHeight: "1.6",
+                whiteSpace: "pre-wrap",
+                wordBreak: "break-word",
+                maxHeight: "350px",
+                overflowY: "auto",
+                fontFamily: "var(--font-sans)",
+              }}
+            >
+              {viewingMessage.message}
+            </div>
+            <div style={{ marginTop: "1.5rem", display: "flex", justifyContent: "flex-end" }}>
+              <button className="btn btn-outline" onClick={() => setViewingMessage(null)} style={{ padding: "0.5rem 1.5rem" }}>
+                Fechar
+              </button>
+            </div>
           </div>
         </div>
       )}
