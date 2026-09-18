@@ -40,6 +40,7 @@ export default async function Home() {
         { time: "19:00", title: "Jantar", description: "Serviço de buffet completo." },
         { time: "21:00", title: "Abertura da Pista", description: "Comemoração e festa até tarde!" },
       ]),
+      reminderMessage: null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };

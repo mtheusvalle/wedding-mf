@@ -43,6 +43,7 @@ export default async function PresentesPage() {
       pixKey: "seu-pix@email.com",
       pixQrCode: "https://images.unsplash.com/photo-1595079676339-1534801ad6cf?auto=format&fit=crop&q=80&w=400",
       timeline: "[]",
+      reminderMessage: null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };

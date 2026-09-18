@@ -143,6 +143,7 @@ export default async function AdminPage() {
       { time: "19:00", title: "Jantar", description: "Serviço de buffet completo." },
       { time: "21:00", title: "Abertura da Pista", description: "Comemoração e festa até tarde!" },
     ]),
+    reminderMessage: "Oi [NOME CONVIDADO]! Passando para lembrar que precisamos da sua confirmação de presença no nosso site: [Link do convite]",
     createdAt: new Date(),
     updatedAt: new Date(),
   };
@@ -164,6 +165,7 @@ export default async function AdminPage() {
     pixKey: finalConfig.pixKey,
     pixQrCode: finalConfig.pixQrCode,
     timeline: finalConfig.timeline,
+    reminderMessage: finalConfig.reminderMessage,
   };
 
   return (

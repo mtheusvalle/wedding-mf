@@ -68,6 +68,7 @@ interface WeddingConfig {
   pixKey: string;
   pixQrCode: string;
   timeline: string;
+  reminderMessage: string | null;
 }
 
 interface AdminDashboardProps {
@@ -209,6 +210,29 @@ export default function AdminDashboard({
   // Open WhatsApp Web/API with pre-filled message
   const sendWhatsAppMessage = (phone: string, guestName: string, guestCode: string) => {
     const msg = getWhatsAppMessage(guestName, guestCode);
+    const cleanPhone = phone.replace(/\D/g, "");
+    
+    let url = "";
+    if (cleanPhone) {
+      let finalPhone = cleanPhone;
+      if (cleanPhone.length >= 10 && !cleanPhone.startsWith("55")) {
+        finalPhone = `55${cleanPhone}`;
+      }
+      url = `https://api.whatsapp.com/send?phone=${finalPhone}&text=${encodeURIComponent(msg)}`;
+    } else {
+      url = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
+    }
+    window.open(url, "_blank");
+  };
+
+  // Open WhatsApp Web/API with reminder message
+  const sendWhatsAppReminder = (phone: string, guestName: string, guestCode: string) => {
+    const inviteLink = `${window.location.origin}/confirmar-presenca/${guestCode}`;
+    let template = config.reminderMessage || "Oi [NOME CONVIDADO]! Passando para lembrar que precisamos da sua confirmação de presença no nosso site: [Link do convite]";
+    template = template.replace(/\[NOME CONVIDADO\]/gi, guestName);
+    template = template.replace(/\[Link do convite\]/gi, inviteLink);
+
+    const msg = template;
     const cleanPhone = phone.replace(/\D/g, "");
     
     let url = "";
@@ -1172,6 +1196,16 @@ export default function AdminDashboard({
                             >
                               💬 Enviar
                             </button>
+                            {g.status === "PENDING" && (
+                              <button
+                                className="btn btn-outline btn-sm"
+                                style={{ padding: "0.3rem 0.6rem", borderColor: "var(--color-primary)", color: "var(--color-primary)" }}
+                                onClick={() => sendWhatsAppReminder(g.phone, g.name, g.code)}
+                                title="Enviar lembrete de confirmação no WhatsApp"
+                              >
+                                🔔 Lembrete
+                              </button>
+                            )}
                             <button
                               className="btn btn-outline btn-sm"
                               style={{ padding: "0.3rem 0.6rem", borderColor: "var(--color-danger)", color: "var(--color-danger)" }}
@@ -1731,6 +1765,27 @@ export default function AdminDashboard({
                       📤 Upload
                     </button>
                   </div>
+                </div>
+              </div>
+
+              <div style={{ borderTop: "1px solid var(--color-border)", padding: "1.5rem 0" }}>
+                <h4 style={{ fontFamily: "var(--font-serif)", fontSize: "1.1rem", marginBottom: "1rem", color: "var(--color-primary)" }}>
+                  Mensagens e Comunicação
+                </h4>
+                <div className="form-group">
+                  <label className="form-label" htmlFor="reminder-message">Mensagem de Lembrete de Confirmação (WhatsApp)</label>
+                  <p style={{ fontSize: "0.8rem", color: "var(--color-text-muted)", marginBottom: "0.5rem" }}>
+                    Esta mensagem será usada no botão "Lembrete" na lista de convidados pendentes. Você pode usar as tags <code>[NOME CONVIDADO]</code> e <code>[Link do convite]</code> que serão substituídas automaticamente.
+                  </p>
+                  <textarea
+                    id="reminder-message"
+                    className="form-control"
+                    rows={6}
+                    placeholder="Ex: Oi [NOME CONVIDADO]! Passando para lembrar que precisamos da sua confirmação..."
+                    value={config.reminderMessage || ""}
+                    onChange={(e) => setConfig({ ...config, reminderMessage: e.target.value })}
+                    style={{ resize: "vertical" }}
+                  />
                 </div>
               </div>
 

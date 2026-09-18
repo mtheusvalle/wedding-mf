@@ -74,6 +74,7 @@ model WeddingConfig {
   pixKey          String   @default("seu-pix@email.com")
   pixQrCode       String   @default("https://images.unsplash.com/photo-1595079676339-1534801ad6cf?auto=format&fit=crop&q=80&w=400")
   timeline        String   @db.Text // JSON string containing timeline array
+  reminderMessage String?  @db.Text
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }

@@ -26,6 +26,7 @@ export async function POST(request: Request) {
       pixKey,
       pixQrCode,
       timeline,
+      reminderMessage,
     } = body;
 
     if (!brideName || !groomName || !weddingDate) {
@@ -60,6 +61,7 @@ export async function POST(request: Request) {
         pixKey: pixKey?.trim() || "seu-pix@email.com",
         pixQrCode: pixQrCode?.trim() || "",
         timeline: timelineStr || "[]",
+        reminderMessage: reminderMessage || "",
       },
       create: {
         id: "global",
@@ -79,6 +81,7 @@ export async function POST(request: Request) {
         pixKey: pixKey?.trim() || "seu-pix@email.com",
         pixQrCode: pixQrCode?.trim() || "",
         timeline: timelineStr || "[]",
+        reminderMessage: reminderMessage || "",
       },
     });
 
