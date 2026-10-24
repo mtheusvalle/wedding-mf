@@ -548,6 +548,20 @@ export default function AdminDashboard({
     }
   };
 
+  // Export current (filtered) guest list as .xlsx
+  const handleGuestExport = async () => {
+    const xlsx = await import("xlsx");
+    const rows = filteredGuests.map((g) => ({
+      Nome: g.name,
+      Telefone: g.phone,
+      "Acompanhantes Confirmados": g.status === "CONFIRMED" ? g.confirmedAdditionalGuests : 0,
+      "Nomes dos Acompanhantes": g.status === "CONFIRMED" ? g.confirmedNames || "" : "",
+    }));
+    const workbook = xlsx.utils.book_new();
+    xlsx.utils.book_append_sheet(workbook, xlsx.utils.json_to_sheet(rows), "Convidados");
+    xlsx.writeFile(workbook, "convidados.xlsx");
+  };
+
   // --- GIFT CRUD OPERATIONS ---
   const openAddGiftModal = () => {
     setEditingGift(null);
@@ -1075,6 +1089,9 @@ export default function AdminDashboard({
                   disabled={importingGuests}
                 >
                   📥 {importingGuests ? "Importando..." : "Importar Planilha"}
+                </button>
+                <button type="button" className="btn btn-outline" onClick={handleGuestExport}>
+                  📤 Exportar Planilha
                 </button>
                 <button className="btn btn-primary" onClick={openAddGuestModal}>
                   ➕ Novo Convidado
